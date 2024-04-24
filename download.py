@@ -37,6 +37,7 @@ def get_token():
             token = file.read().strip()
             return token
     except Exception as e:
+        print(f"Error reading token file: {e}")
         return None
 
 
@@ -93,13 +94,12 @@ def download_file(url: str, output_path: str, token: str):
     if total_size is not None:
         total_size = int(total_size)
 
-    output_file = os.path.join(output_path, filename)
-    output_file_obj = Path(output_file)
+    output_file = Path(output_path) / filename
     
     # Check if the file already exists and compare sizes
-    if output_file_obj.exists():
-        if total_size and output_file_obj.stat().st_size == int(total_size):
-            print(f"File already downloaded and up to date: {output_file_obj}")
+    if output_file.exists():
+        if total_size and output_file.stat().st_size == int(total_size):
+            print(f"File already downloaded and up to date: {output_file}")
             return
 
     with open(output_file, 'wb') as f:
@@ -120,6 +120,8 @@ def download_file(url: str, output_path: str, token: str):
 
             if chunk_time > 0:
                 speed = len(buffer) / chunk_time / (1024 ** 2)  # Speed in MB/s
+            else:
+                speed = float('inf')  # Indicates an instant download speed, unlikely but for safety
 
             if total_size is not None:
                 progress = downloaded / total_size
