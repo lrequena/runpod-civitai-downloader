@@ -95,6 +95,12 @@ def download_file(url: str, output_path: str, token: str):
 
     output_file = os.path.join(output_path, filename)
 
+    # Check if the file already exists and compare sizes
+    if output_file.exists():
+        if total_size and output_file.stat().st_size == int(total_size):
+            print(f"File already downloaded and up to date: {output_file}")
+            return
+
     with open(output_file, 'wb') as f:
         downloaded = 0
         start_time = time.time()
@@ -147,7 +153,6 @@ def main():
         download_file(args.url, args.output_path, token)
     except Exception as e:
         print(f'ERROR: {e}')
-
 
 if __name__ == '__main__':
     main()
